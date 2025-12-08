@@ -43,3 +43,7 @@ codegen-units = 1
 # Do a second optimization pass over the entire program, including dependencies.
 # Slows compile times, marginal improvements.
 lto = "thin"
+
+[[example]]
+name = "custom_vertex"
+path = "examples/custom_vertex.rs"
