@@ -1,5 +1,6 @@
 use bevy::{
     asset::RenderAssetUsages,
+    camera::primitives::Aabb,
     mesh::{Indices, MeshVertexAttribute, MeshVertexBufferLayoutRef, PrimitiveTopology},
     pbr::{MaterialPipeline, MaterialPipelineKey},
     prelude::*,
@@ -61,7 +62,6 @@ impl Material for ChunkMaterial {
 fn setup(
     mut commands: Commands,
     mut chunk_materials: ResMut<Assets<ChunkMaterial>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
 ) {
     // Create and save a handle to the mesh.
@@ -69,18 +69,12 @@ fn setup(
 
     // Render the mesh with the custom texture, and add the marker.
     commands.spawn((
+        Aabb::from_min_max(Vec3::ZERO, Vec3::splat(32.0)),
         Mesh3d(cube_mesh_handle),
         MeshMaterial3d(chunk_materials.add(ChunkMaterial {
             color: LinearRgba::WHITE,
         })),
         Transform::from_xyz(0.0, 0.0, 0.0),
-    ));
-
-    // spawn default cube for reference
-    commands.spawn((
-        Mesh3d(meshes.add(Cuboid::new(1.0, 1.0, 1.0))),
-        MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
-        Transform::from_xyz(0.0, -3.0, 0.0),
     ));
 
     // camera
@@ -105,15 +99,6 @@ fn create_cube_mesh() -> Mesh {
         ],
     )
     .with_inserted_indices(Indices::U32(vec![0, 2, 1]))
-    .with_inserted_attribute(
-        Mesh::ATTRIBUTE_POSITION,
-        vec![
-            // top (facing towards +y)
-            [-0.25, 0.5, -0.1], // vertex with index 0
-            [0.5, 0.5, -0.5],   // vertex with index 1
-            [0.5, 0.5, 0.5],    // etc. until 23
-        ],
-    )
 }
 
 fn vertex_pack(x: u32, y: u32, z: u32) -> u32 {
